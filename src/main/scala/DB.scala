@@ -1,24 +1,30 @@
-import cats.effect.IO
+import cats.effect._
 import doobie.hikari.HikariTransactor
+import com.zaxxer.hikari.HikariConfig
 import org.flywaydb.core.Flyway
 
 object DB {
-  def transactor(): IO[HikariTransactor[IO]] = {
-    HikariTransactor.newHikariTransactor[IO]("org.h2.Driver",
-      "jdbc:h2:mem:ch14;DB_CLOSE_DELAY=-1",
-      "jose",
-      ""
-    )
-  }
+  def transactor(): Resource[IO, HikariTransactor[IO]] =
+    for {
+      hikariConfig <- Resource.pure {
+        val config = new HikariConfig()
+        config.setDriverClassName("org.h2.Driver")
+        config.setJdbcUrl("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1")
+        config.setUsername("sa")
+        config.setPassword("")
+        config
+      }
+      xa <- HikariTransactor.fromHikariConfig[IO](hikariConfig)
+    } yield xa
 
   def initialize(transactor: HikariTransactor[IO]): IO[Unit] = {
     transactor.configure { dataSource =>
       IO {
-        val flyWay = new Flyway()
-        flyWay.setLocations("classpath:db_migrations")
-        flyWay.setDataSource(dataSource)
+        val flyWay = Flyway.configure().dataSource(dataSource).load()
         flyWay.migrate()
+        ()
       }
     }
   }
+
 }
