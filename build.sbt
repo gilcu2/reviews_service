@@ -3,6 +3,9 @@ val CirceVersion = "0.14.3"
 val MunitVersion = "0.7.29"
 val LogbackVersion = "1.2.11"
 val MunitCatsEffectVersion = "1.0.7"
+val doobieVersion = "1.0.0-RC4"
+val h2Version = "2.2.222"
+val flywayVersion = "9.22.0"
 
 lazy val root = (project in file("."))
   .settings(
@@ -16,7 +19,10 @@ lazy val root = (project in file("."))
       "org.http4s"      %% "http4s-circe"        % Http4sVersion,
       "org.http4s"      %% "http4s-dsl"          % Http4sVersion,
       "io.circe"        %% "circe-generic"       % CirceVersion,
-
+      "org.tpolecat" %% "doobie-h2" % doobieVersion,
+      "org.tpolecat" %% "doobie-hikari" % doobieVersion,
+      "com.h2database" % "h2" % h2Version,
+      "org.flywaydb" % "flyway-core" % flywayVersion,
       "org.scalameta"   %% "svm-subs"            % "20.2.0",
       "ch.qos.logback"  %  "logback-classic"     % LogbackVersion         % Runtime,
       "org.scalameta"   %% "munit"               % MunitVersion           % Test,
