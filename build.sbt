@@ -4,7 +4,7 @@ val MunitVersion = "0.7.29"
 val LogbackVersion = "1.2.11"
 val MunitCatsEffectVersion = "1.0.7"
 val doobieVersion = "1.0.0-RC3"
-val h2Version = "2.2.222"
+val h2Version = "2.2.220"
 val flywayVersion = "9.22.0"
 
 lazy val root = (project in file("."))
@@ -30,6 +30,7 @@ lazy val root = (project in file("."))
       "org.typelevel"   %% "munit-cats-effect-3" % MunitCatsEffectVersion % Test,
       "com.alejandrohdezma" %% "http4s-munit" % "0.15.1" % Test,
       "org.typelevel" %% "munit-cats-effect-3" % "1.0.6" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.17" % Test
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector"     % "0.13.2" cross CrossVersion.full),
     addCompilerPlugin("com.olegpy"    %% "better-monadic-for" % "0.3.1"),
