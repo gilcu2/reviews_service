@@ -1,10 +1,9 @@
 import org.scalatest._
-import org.scalatest.flatspec.AnyFlatSpec
 import Model.Review
 import io.circe.parser.decode
 import io.circe.generic.auto._, io.circe.syntax._
 
-class ReviewTest extends AnyFlatSpec with GivenWhenThen {
+class ReviewTest extends flatspec.AnyFlatSpec with GivenWhenThen {
 
   "A Review" should "deserialize from some fields" in {
     Given("a json string")

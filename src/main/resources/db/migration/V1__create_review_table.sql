@@ -21,3 +21,11 @@ CREATE TABLE review (
   airport_staff_rating INTEGER,
   recommended INTEGER
 );
+
+--INSERT INTO review (
+--    id,airport_name,title,author,content
+--) values (
+--    1,'airport_name','title','author','content'
+--);
+
+
