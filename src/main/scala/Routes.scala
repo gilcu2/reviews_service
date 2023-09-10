@@ -29,6 +29,13 @@ class Routes(repository: Repository) {
         createdReview <- repository.createReview(review)
         response <- Created(createdReview.asJson)
       } yield response
+
+
+    case GET -> Root / "all" / "stats" =>
+      for {
+        getResult <- repository.getAllStats()
+        response <- reviewResult(getResult)
+      } yield response
   }
 
   private def reviewResult(result: Either[ReviewNotFoundError.type, Review]) = {

@@ -24,4 +24,6 @@ object Model {
 
   case object ReviewNotFoundError
 
+  case class AirportReviewCount(airport_name: String,review_count:Int)
+
 }
