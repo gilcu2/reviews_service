@@ -22,7 +22,6 @@ object DB {
       IO {
         val flyWay = Flyway.configure().dataSource(dataSource).load()
         flyWay.migrate()
-        ()
       }
     }
   }

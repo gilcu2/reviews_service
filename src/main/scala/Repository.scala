@@ -7,7 +7,7 @@ import Model._
 
 class Repository(transactor: Transactor[IO]) {
 
-  def putReview(review: Review): IO[Review] = {
+  def createReview(review: Review): IO[Review] = {
     sql"""
     INSERT INTO review (
       airport_name,
