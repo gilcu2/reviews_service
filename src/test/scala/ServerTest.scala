@@ -14,7 +14,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.slf4j.LoggerFactory
 import org.scalatest._
 import io.circe.literal._
-import io.circe.generic.auto._, io.circe.syntax._
+import io.circe.generic.auto._
+import io.circe.syntax._
 
 class ServerTest extends flatspec.AnyFlatSpec with Matchers
   with GivenWhenThen with BeforeAndAfterAll with Eventually {
@@ -75,6 +76,16 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
 
     Then("result is the expected")
     assert(resultGet.airport_name == expected.airport_name)
+  }
+
+  "Server" should "retrieve Review stats" in {
+    Given("Some reviews in the DB")
+    val reviews = List(
+      Review(airport_name = "a1", title = "t1", author = "a1", content = "c1"),
+      Review(airport_name = "a1", title = "t2", author = "a1", content = "c1"),
+      Review(airport_name = "a2",title = "t3",author = "a1",content = "c1")
+    )
+
   }
 
   private def resultHandler(result: Either[Throwable, ExitCode]): Unit = {

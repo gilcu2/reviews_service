@@ -3,10 +3,12 @@ import cats.effect.IO
 import org.http4s._
 import org.http4s.dsl.io._
 import Model._
+import fs2.Stream
 import io.circe.generic.auto._
 import io.circe.syntax._
 import io.circe.{Decoder, Encoder}
 import org.http4s.circe._
+import org.http4s.headers.`Content-Type`
 import org.typelevel.log4cats.LoggerFactory
 
 
@@ -32,10 +34,12 @@ class Routes(repository: Repository) {
 
 
     case GET -> Root / "all" / "stats" =>
-      for {
-        getResult <- repository.getAllStats()
-        response <- reviewResult(getResult)
-      } yield response
+      Ok(
+        Stream("[")
+          ++ repository.getAllStats.map(_.asJson.noSpaces).intersperse(",")
+          ++ Stream("]"),
+        `Content-Type`(MediaType.application.json)
+      )
   }
 
   private def reviewResult(result: Either[ReviewNotFoundError.type, Review]) = {
