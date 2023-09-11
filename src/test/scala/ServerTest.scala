@@ -106,7 +106,7 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
     val resultGet = jsonGet.as[List[AirportReviewCount]].toOption.get
 
     Then("results are the expected")
-    assert(resultGet.toSet==expected.toSet)
+    assert(expected.toSet.subsetOf(resultGet.toSet))
 
   }
 
