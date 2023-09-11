@@ -19,9 +19,19 @@ object Model {
                     airport_shopping_rating: Option[Int]=None,
                     wifi_connectivity_rating: Option[Int]=None,
                     airport_staff_rating: Option[Int]=None,
-                    recommended: Option[Boolean]=None,
+                    recommended: Option[Int]=None,
                    )
 
   case object ReviewNotFoundError
+
+  case class AirportReviewCount(airport_name: String,review_count:Int)
+  case class AirportStats(airport_name: String,review_count:Int,
+                          average_overall_rating:Double,recomended_count:Int)
+
+  case object AirportNotFoundError
+
+  case class AirportReview(airport_name: String,overall_rating:Int,
+                           date:String,content:String,
+                           author:String,author_country:String)
 
 }
