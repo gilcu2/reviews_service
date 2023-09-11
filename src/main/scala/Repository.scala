@@ -73,13 +73,45 @@ class Repository(transactor: Transactor[IO]) {
       }
   }
 
-  def getAllStats: Stream[IO, Review] = {
+  def getAllStats: Stream[IO, AirportReviewCount] = {
     sql"""
          SELECT airport_name, count(*) as review_count
          FROM review
          GROUP BY airport_name
       """
-      .query[Review].stream.transact(transactor)
+      .query[AirportReviewCount].stream.transact(transactor)
+  }
+
+  def getAirportStats(airport_name:String)
+  : IO[Either[AirportNotFoundError.type, AirportStats]] = {
+    sql"""
+         SELECT
+            airport_name,
+            count(*) as review_count,
+            AVG(overall_rating) as average_overall_rating,
+            SUM(recommended)
+         FROM review
+         WHERE airport_name = $airport_name
+      """
+      .query[AirportStats].option.transact(transactor).map {
+        case Some(stat) => Right(stat)
+        case None => Left(AirportNotFoundError)
+      }
+  }
+
+  def getAirportReviews(airport_name:String): Stream[IO, AirportReview] = {
+    sql"""
+         SELECT
+            airport_name,
+            overall_rating,
+            date,
+            content,
+            author,
+            author_country
+         FROM review
+         WHERE airport_name = $airport_name
+      """
+      .query[AirportReview].stream.transact(transactor)
   }
 
 }
