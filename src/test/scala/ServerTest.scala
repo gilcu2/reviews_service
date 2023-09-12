@@ -142,14 +142,17 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
 
   }
 
-  "Server" should "retrieve Airport Reviews" in {
-    Given("Some reviews in the DB")
+  "Server" should "retrieve Reviews of given airport" in {
+    Given("airport name")
+    val airport_name="a5"
+
+    And("Some reviews of this airport in the DB")
     val reviews = List(
-      Review(airport_name = "a5", title = "t1", author = "a1", content = "c1",
+      Review(airport_name = airport_name, title = "t1", author = "a1", content = "c1",
         overall_rating=Some(6),recommended = Some(1),
         date=Option("1/1/23"), author_country = Option("de")
       ),
-      Review(airport_name = "a5", title = "t2", author = "a2", content = "c1",
+      Review(airport_name = airport_name, title = "t2", author = "a2", content = "c1",
         overall_rating = Some(5), recommended = Some(1),
         date = Option("1/1/23"), author_country = Option("de")
       )
@@ -164,13 +167,13 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
 
     And("The expected values")
     val expected = List(
-      AirportReview("a5", 6,"1/1/23","c1","a1","de"),
-      AirportReview("a5", 5,"1/1/23","c1","a2","de")
+      AirportReview(airport_name, 6,"1/1/23","c1","a1","de"),
+      AirportReview(airport_name, 5,"1/1/23","c1","a2","de")
     )
 
     When("retrieve the reviews")
     val requestGet = Request[IO](method = Method.GET,
-      uri = Uri.unsafeFromString(s"$rootUrl/a5/reviews"))
+      uri = Uri.unsafeFromString(s"$rootUrl/$airport_name/reviews"))
     val jsonGet = client.use(_.expect[Json](requestGet)).unsafeRunSync()
     val resultGet = jsonGet.as[List[AirportReview]].toOption.get
 
@@ -178,6 +181,99 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
     assert(resultGet.toSet == expected.toSet)
 
   }
+
+  "Server" should "retrieve Reviews of given airport with minimum overall rating" in {
+    Given("airport name and minimum overall rating")
+    val airport_name = "a6"
+    val minimum_overall_rating = 6
+
+    And("Some reviews of this airport in the DB")
+    val reviews = List(
+      Review(airport_name = airport_name, title = "t1", author = "a1", content = "c1",
+        overall_rating = Some(6), recommended = Some(1),
+        date = Option("1/1/23"), author_country = Option("de")
+      ),
+      Review(airport_name = airport_name, title = "t2", author = "a2", content = "c1",
+        overall_rating = Some(5), recommended = Some(1),
+        date = Option("1/1/23"), author_country = Option("de")
+      ),
+      Review(airport_name = airport_name, title = "t3", author = "a2", content = "c1",
+        overall_rating = Some(7), recommended = Some(1),
+        date = Option("1/1/23"), author_country = Option("de")
+      )
+    )
+    reviews.foreach(r => {
+      val r_json = r.asJson
+      val requestPost = Request[IO](method = Method.POST,
+        uri = Uri.unsafeFromString(s"$rootUrl/review"))
+        .withEntity(r_json)
+      client.use(_.expect[Json](requestPost)).unsafeRunSync()
+    })
+
+    And("The expected values")
+    val expected = List(
+      AirportReview(airport_name, 6, "1/1/23", "c1", "a1", "de"),
+      AirportReview(airport_name, 7, "1/1/23", "c1", "a2", "de")
+    )
+
+    When("retrieve the reviews")
+    val requestGet = Request[IO](method = Method.GET,
+      uri = Uri.unsafeFromString(
+        s"$rootUrl/$airport_name/reviews?overall_rating=$minimum_overall_rating"
+      )
+    )
+    val jsonGet = client.use(_.expect[Json](requestGet)).unsafeRunSync()
+    val resultGet = jsonGet.as[List[AirportReview]].toOption.get
+
+    Then("results are the expected")
+    assert(resultGet.toSet == expected.toSet)
+
+  }
+
+
+  "Server" should "create a Review with the given airport name" in {
+    Given("Review json")
+    val json_string =
+      json"""
+        {
+          "airport_name":"MUN",
+          "title": "title",
+          "author": "author",
+          "content": "content"
+        }
+        """
+
+    And("another airport name")
+    val airport_name="BER"
+
+    And("The expected result")
+    val expected = Review(airport_name = "BER", title = "title",
+      author = "author", content = "content")
+
+    When("Post the Review")
+    val requestPost = Request[IO](method = Method.POST,
+      uri = Uri.unsafeFromString(s"$rootUrl/$airport_name/review"))
+      .withEntity(json_string)
+    val jsonPost = client.use(_.expect[Json](requestPost)).unsafeRunSync()
+    val resultPost = jsonPost.as[Review].toOption.get
+
+    Then("result is the expected")
+    assert(resultPost.airport_name == expected.airport_name)
+
+    And("Given the id")
+    val id = resultPost.id.get
+
+    When("Get the the Review")
+    val requestGet = Request[IO](method = Method.GET,
+      uri = Uri.unsafeFromString(s"$rootUrl/review/$id"))
+    val jsonGet = client.use(_.expect[Json](requestGet)).unsafeRunSync()
+    val resultGet = jsonGet.as[Review].toOption.get
+
+    Then("result is the expected")
+    assert(resultGet.airport_name == expected.airport_name)
+  }
+
+
 
 
   private def resultHandler(result: Either[Throwable, ExitCode]): Unit = {
