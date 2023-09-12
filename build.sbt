@@ -6,6 +6,7 @@ val MunitCatsEffectVersion = "1.0.7"
 val doobieVersion = "1.0.0-RC3"
 val h2Version = "2.2.220"
 val flywayVersion = "9.22.0"
+val PureConfigVersion = "0.17.4"
 
 lazy val root = (project in file("."))
   .settings(
@@ -27,6 +28,8 @@ lazy val root = (project in file("."))
       "org.flywaydb" % "flyway-core" % flywayVersion,
       "org.scalameta" %% "svm-subs" % "20.2.0",
       "ch.qos.logback" % "logback-classic" % LogbackVersion % Runtime,
+      "com.github.pureconfig" %% "pureconfig" % PureConfigVersion,
+      "com.github.pureconfig" %% "pureconfig-cats-effect" % PureConfigVersion,
       "io.circe" %% "circe-literal" % CirceVersion % "it,test",
       "org.scalameta" %% "munit" % MunitVersion % Test,
       "org.typelevel" %% "munit-cats-effect-3" % MunitCatsEffectVersion % Test,

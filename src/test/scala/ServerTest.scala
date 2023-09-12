@@ -2,6 +2,7 @@ import Model.{AirportReview, AirportReviewCount, AirportStats, Review}
 import cats.effect.IO
 import cats.effect.{ExitCode, IO}
 import cats.effect.unsafe.IORuntime
+import config.Config
 import io.circe.Json
 import org.http4s.blaze.client.BlazeClientBuilder
 import org.http4s.circe._
@@ -21,7 +22,11 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
   with GivenWhenThen with BeforeAndAfterAll with Eventually {
   private lazy val client = BlazeClientBuilder[IO].resource
 
-  private val rootUrl = s"http://localhost:8080/api"
+  private val configFile = "test.conf"
+
+  private lazy val config = Config.load(configFile).use(config => IO.pure(config)).unsafeRunSync()
+
+  private lazy val rootUrl = s"http://${config.server.host}:${config.server.port}/api"
 
   private implicit val runtime: IORuntime = cats.effect.unsafe.IORuntime.global
 
@@ -32,7 +37,7 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
       interval = scaled(Span(100, Millis)))
 
   override def beforeAll(): Unit = {
-    Server.create().unsafeRunAsync(resultHandler)
+    Server.create(configFile).unsafeRunAsync(resultHandler)
     eventually {
       client.use(_.statusFromUri(Uri.unsafeFromString(s"$rootUrl/hello"))).unsafeRunSync() shouldBe Status.Ok
     }
@@ -83,10 +88,10 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
     val reviews = List(
       Review(airport_name = "a1", title = "t1", author = "a1", content = "c1"),
       Review(airport_name = "a1", title = "t2", author = "a1", content = "c1"),
-      Review(airport_name = "a2",title = "t3",author = "a1",content = "c1")
+      Review(airport_name = "a2", title = "t3", author = "a1", content = "c1")
     )
-    reviews.foreach(r=>{
-      val r_json=r.asJson
+    reviews.foreach(r => {
+      val r_json = r.asJson
       val requestPost = Request[IO](method = Method.POST,
         uri = Uri.unsafeFromString(s"$rootUrl/review"))
         .withEntity(r_json)
@@ -94,9 +99,9 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
     })
 
     And("The expected values")
-    val expected=List(
-      AirportReviewCount("a1",2),
-      AirportReviewCount("a2",1)
+    val expected = List(
+      AirportReviewCount("a1", 2),
+      AirportReviewCount("a2", 1)
     )
 
     When("retrieve the stats")
@@ -114,11 +119,11 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
     Given("Some reviews in the DB")
     val reviews = List(
       Review(airport_name = "a3", title = "t1", author = "a1", content = "c1",
-        overall_rating=Some(6),recommended = Some(1)),
+        overall_rating = Some(6), recommended = Some(1)),
       Review(airport_name = "a3", title = "t2", author = "a1", content = "c1",
-        overall_rating=Some(4),recommended = Some(1)),
+        overall_rating = Some(4), recommended = Some(1)),
       Review(airport_name = "a3", title = "t3", author = "a1", content = "c1",
-        overall_rating=Some(2),recommended = Some(0))
+        overall_rating = Some(2), recommended = Some(0))
     )
     reviews.foreach(r => {
       val r_json = r.asJson
@@ -129,7 +134,7 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
     })
 
     And("The expected values")
-    val expected = AirportStats("a3", 3,4.0,2)
+    val expected = AirportStats("a3", 3, 4.0, 2)
 
     When("retrieve the stats")
     val requestGet = Request[IO](method = Method.GET,
@@ -144,13 +149,13 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
 
   "Server" should "retrieve Reviews of given airport" in {
     Given("airport name")
-    val airport_name="a5"
+    val airport_name = "a5"
 
     And("Some reviews of this airport in the DB")
     val reviews = List(
       Review(airport_name = airport_name, title = "t1", author = "a1", content = "c1",
-        overall_rating=Some(6),recommended = Some(1),
-        date=Option("1/1/23"), author_country = Option("de")
+        overall_rating = Some(6), recommended = Some(1),
+        date = Option("1/1/23"), author_country = Option("de")
       ),
       Review(airport_name = airport_name, title = "t2", author = "a2", content = "c1",
         overall_rating = Some(5), recommended = Some(1),
@@ -167,8 +172,8 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
 
     And("The expected values")
     val expected = List(
-      AirportReview(airport_name, 6,"1/1/23","c1","a1","de"),
-      AirportReview(airport_name, 5,"1/1/23","c1","a2","de")
+      AirportReview(airport_name, 6, "1/1/23", "c1", "a1", "de"),
+      AirportReview(airport_name, 5, "1/1/23", "c1", "a2", "de")
     )
 
     When("retrieve the reviews")
@@ -244,7 +249,7 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
         """
 
     And("another airport name")
-    val airport_name="BER"
+    val airport_name = "BER"
 
     And("The expected result")
     val expected = Review(airport_name = "BER", title = "title",
@@ -272,8 +277,6 @@ class ServerTest extends flatspec.AnyFlatSpec with Matchers
     Then("result is the expected")
     assert(resultGet.airport_name == expected.airport_name)
   }
-
-
 
 
   private def resultHandler(result: Either[Throwable, ExitCode]): Unit = {
