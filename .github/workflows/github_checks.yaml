@@ -1,0 +1,20 @@
+name: checks
+
+on: [ pull_request, workflow_dispatch]
+#on: [ push, workflow_dispatch]
+
+jobs:
+
+  checks:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: olafurpg/setup-scala@v11
+      with:
+        java-version: openjdk@1.17
+
+    - name: Test
+      run: sbt test
+

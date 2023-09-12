@@ -11,6 +11,9 @@ import org.http4s.circe._
 import org.http4s.headers.`Content-Type`
 import org.typelevel.log4cats.LoggerFactory
 
+object OptionalOverallRatingParamMatcher extends OptionalQueryParamDecoderMatcher[Double]("overall_rating")
+
+
 
 class Routes(repository: Repository) {
 
@@ -27,7 +30,6 @@ class Routes(repository: Repository) {
     case req@POST -> Root / "review" =>
       for {
         review <- req.decodeJson[Review]
-        _ <- IO.println(s"Request: $review")
         createdReview <- repository.createReview(review)
         response <- Created(createdReview.asJson)
       } yield response
@@ -46,14 +48,22 @@ class Routes(repository: Repository) {
         response <- reviewStats(getResult)
       } yield response
 
-    case GET -> Root / airport_name / "reviews" =>
+    case GET -> Root / airport_name / "reviews" :? OptionalOverallRatingParamMatcher(overall_rating) =>
       Ok(
         Stream("[")
-          ++ repository.getAirportReviews(airport_name)
+          ++ repository.getAirportReviews(airport_name,overall_rating)
             .map(_.asJson.noSpaces).intersperse(",")
           ++ Stream("]"),
         `Content-Type`(MediaType.application.json)
       )
+
+    case req@POST -> Root / airport_name/ "review" =>
+      for {
+        review <- req.decodeJson[Review]
+        updated_review = review.copy(airport_name = airport_name)
+        createdReview <- repository.createReview(updated_review)
+        response <- Created(createdReview.asJson)
+      } yield response
   }
 
   private def reviewResult(result: Either[ReviewNotFoundError.type, Review]) = {

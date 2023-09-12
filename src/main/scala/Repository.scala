@@ -82,7 +82,7 @@ class Repository(transactor: Transactor[IO]) {
       .query[AirportReviewCount].stream.transact(transactor)
   }
 
-  def getAirportStats(airport_name:String)
+  def getAirportStats(airport_name: String)
   : IO[Either[AirportNotFoundError.type, AirportStats]] = {
     sql"""
          SELECT
@@ -99,7 +99,8 @@ class Repository(transactor: Transactor[IO]) {
       }
   }
 
-  def getAirportReviews(airport_name:String): Stream[IO, AirportReview] = {
+  def getAirportReviews(airport_name: String, maybe_minimum_overall_rating: Option[Double] = None): Stream[IO, AirportReview] = {
+    val minimum_overall_rating=maybe_minimum_overall_rating.getOrElse(0.0)
     sql"""
          SELECT
             airport_name,
@@ -109,7 +110,7 @@ class Repository(transactor: Transactor[IO]) {
             author,
             author_country
          FROM review
-         WHERE airport_name = $airport_name
+         WHERE airport_name = $airport_name AND overall_rating >= $minimum_overall_rating
       """
       .query[AirportReview].stream.transact(transactor)
   }
