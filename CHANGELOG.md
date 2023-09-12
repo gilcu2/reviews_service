@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2023-08-12
+### Added
+- Config
+
 ## [0.2.0] - 2023-08-12
 ### Added
 - Bonus services
@@ -19,3 +23,4 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 [Unreleased]: https://github.com/gilcu2/reviews_service/master
 [0.1.0]: https://github.com/gilcu2/reviews_service/releases/tag/0.1.0
 [0.2.0]: https://github.com/gilcu2/reviews_service/releases/tag/0.2.0
+[0.3.0]: https://github.com/gilcu2/reviews_service/releases/tag/0.3.0
