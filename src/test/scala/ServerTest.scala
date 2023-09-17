@@ -11,7 +11,6 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
-import org.scalatest.wordspec.AnyWordSpec
 import org.slf4j.LoggerFactory
 import org.scalatest._
 import io.circe.literal._

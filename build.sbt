@@ -12,11 +12,10 @@ lazy val root = (project in file("."))
   .settings(
     organization := "com.example",
     name := "reviews_service",
-    version := "0.0.1-SNAPSHOT",
+    version := "0.0.4",
     scalaVersion := "2.13.12",
     libraryDependencies ++= Seq(
       "org.http4s" %% "http4s-blaze-server" % Http4sVersion,
-      //      "org.http4s" %% "http4s-ember-client" % Http4sVersion,
       "org.http4s" %% "http4s-blaze-client" % Http4sVersion,
       "org.http4s" %% "http4s-circe" % Http4sVersion,
       "org.http4s" %% "http4s-dsl" % Http4sVersion,
@@ -36,9 +35,10 @@ lazy val root = (project in file("."))
       "com.alejandrohdezma" %% "http4s-munit" % "0.15.1" % Test,
       "org.typelevel" %% "munit-cats-effect-3" % "1.0.6" % Test,
       "org.scalatest" %% "scalatest" % "3.2.17" % Test,
-      "org.tpolecat" %% "doobie-scalatest" % doobieVersion % Test
+      "org.tpolecat" %% "doobie-scalatest" % doobieVersion % Test,
+      "org.typelevel" %% "cats-effect-testing-scalatest" % "1.5.0" % Test,
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.13.2" cross CrossVersion.full),
     addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),
-    testFrameworks += new TestFramework("munit.Framework")
+//    testFrameworks += new TestFramework("munit.Framework")
   )

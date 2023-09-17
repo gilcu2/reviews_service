@@ -56,8 +56,10 @@ class Repository(transactor: Transactor[IO]) {
       ${review.recommended}
     );
     """
+    IO.println("Before update")
     val sql_query_updated = sql_query
       .update
+    IO.println("After update")
     sql_query_updated
       .withUniqueGeneratedKeys[Long]("id")
       .transact(transactor)

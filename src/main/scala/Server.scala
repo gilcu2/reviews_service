@@ -33,7 +33,8 @@ object Server {
     } yield exitCode
   }
 
-  private def withErrorLogging(repository: Repository): Kleisli[IO, Request[IO], Response[IO]] =
+  private def withErrorLogging(repository: Repository):
+  Kleisli[IO, Request[IO], Response[IO]] =
     ErrorHandling.Recover.total(
       ErrorAction.log(
         Router("/api" -> new Routes(repository).routes).orNotFound,
