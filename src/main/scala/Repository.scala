@@ -75,10 +75,11 @@ class Repository(transactor: Transactor[IO]) {
       }
   }
 
-  def getAllStats: Stream[IO, AirportReviewCount] = {
+  def getAllStats(airport_name_begin: String = ""): Stream[IO, AirportReviewCount] = {
     sql"""
          SELECT airport_name, count(*) as review_count
          FROM review
+         WHERE airport_name LIKE ${airport_name_begin + "%"}
          GROUP BY airport_name
       """
       .query[AirportReviewCount].stream.transact(transactor)
@@ -102,7 +103,7 @@ class Repository(transactor: Transactor[IO]) {
   }
 
   def getAirportReviews(airport_name: String, maybe_minimum_overall_rating: Option[Double] = None): Stream[IO, AirportReview] = {
-    val minimum_overall_rating=maybe_minimum_overall_rating.getOrElse(0.0)
+    val minimum_overall_rating = maybe_minimum_overall_rating.getOrElse(0.0)
     sql"""
          SELECT
             airport_name,

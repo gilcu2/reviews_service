@@ -37,7 +37,7 @@ class Routes(repository: Repository) {
     case GET -> Root / "all" / "stats" =>
       Ok(
         Stream("[")
-          ++ repository.getAllStats.map(_.asJson.noSpaces).intersperse(",")
+          ++ repository.getAllStats().map(_.asJson.noSpaces).intersperse(",")
           ++ Stream("]"),
         `Content-Type`(MediaType.application.json)
       )

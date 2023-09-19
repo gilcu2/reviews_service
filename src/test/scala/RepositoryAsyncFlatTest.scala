@@ -11,7 +11,6 @@ class RepositoryAsyncFlatTest extends flatspec.AsyncFlatSpec with AsyncIOSpec
 
   val transactor: Resource[IO, HikariTransactor[IO]] = DB.transactor()
 
-
   "Repository" should "create and retrieve a Review" in {
     Given("Review")
     val review = Review(airport_name = "FRA", title = "title",
