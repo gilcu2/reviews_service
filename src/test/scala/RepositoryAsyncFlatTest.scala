@@ -17,7 +17,7 @@ class RepositoryAsyncFlatTest extends flatspec.AsyncFlatSpec with AsyncIOSpec
       author = "author", content = "content")
 
     When("save to repo and load result")
-    val r = transactor.use(t =>
+    val r: IO[Review] = transactor.use(t =>
       for {
         _ <- DB.initialize(t).debug_thread
         repository = new Repository(t)

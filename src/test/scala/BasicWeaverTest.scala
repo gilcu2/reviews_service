@@ -1,7 +1,7 @@
 import weaver.IOSuite
 import cats.effect._
 
-object RepositoryWeaverTest extends IOSuite {
+object BasicWeaverTest extends IOSuite {
 
   type Res = Int
 

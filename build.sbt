@@ -37,7 +37,8 @@ lazy val root = (project in file("."))
       "org.scalatest" %% "scalatest" % "3.2.17" % Test,
       "org.tpolecat" %% "doobie-scalatest" % doobieVersion % Test,
       "org.typelevel" %% "cats-effect-testing-scalatest" % "1.5.0" % Test,
-      "com.disneystreaming" %% "weaver-cats" % "0.8.3" % Test
+      "com.disneystreaming" %% "weaver-cats" % "0.8.3" % Test,
+      "org.tpolecat" %% "doobie-munit" % doobieVersion % Test,
     ),
     addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.13.2" cross CrossVersion.full),
     addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.1"),

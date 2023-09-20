@@ -5,6 +5,7 @@ import debug._
 import doobie.hikari.HikariTransactor
 import org.scalatest._
 import org.scalatest.matchers.should.Matchers
+import cats.syntax.all._
 
 class RepositoryComposeResourceTest extends flatspec.AsyncFlatSpec with AsyncIOSpec
   with  GivenWhenThen with Matchers {
@@ -43,7 +44,7 @@ class RepositoryComposeResourceTest extends flatspec.AsyncFlatSpec with AsyncIOS
 
   "Server" should "retrieve All Reviews Statistics" in {
     Given("Some reviews in the DB")
-    val reviews = Array(
+    val reviews = List(
       Review(airport_name = "as1", title = "t1", author = "a1", content = "c1"),
       Review(airport_name = "as1", title = "t2", author = "a1", content = "c1"),
       Review(airport_name = "as2", title = "t3", author = "a1", content = "c1")
@@ -60,9 +61,7 @@ class RepositoryComposeResourceTest extends flatspec.AsyncFlatSpec with AsyncIOS
       for {
         _ <- IO.println("begin retrieve All Reviews Statistics")
         repository = new Repository(t)
-        _ <- repository.createReview(reviews(0))
-        _ <- repository.createReview(reviews(1))
-        _ <- repository.createReview(reviews(2))
+        _ <- reviews.traverse(repository.createReview)
         stats <- repository.getAllStats("as").compile.toList
       } yield stats )
 
